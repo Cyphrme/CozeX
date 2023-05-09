@@ -139,6 +139,19 @@ to base64 "AP8".
 RFC 4648 base64 URI truncated (b64ut) is the selected encoding (padding
 characters removed and use the base64url alphabet). 
 
+### Base 64 Canonical encoding (strict encoding) concerns
+Canonical (sometimes called "strict") base 64 encoding is required.  
+
+Why is canonical enocding important?  The b64ut strings `hOk` and `hOl` may
+decode to the same byte string (Hex `84E9`), even though they are different
+UTF-8 values.  For the Hex value `84E9`, `hOk` is the strict encoding. 
+
+It order to prohibit malleability, it is required that Coze implementations
+reject non-canonical encoding for Coze fields and use strict base64 values.  
+
+See the Github issue: https://github.com/Cyphrme/Coze/issues/18
+
+
 ## Consideration for mixed encoding
 Mixed encoding should be unsupported and should result in an error. This is
 simpler to implement.  All relevant lengths can be checked and if any do not
@@ -186,3 +199,6 @@ valid in JOSE.
   "typ": "cyphr.me/msg/create"
 }.7uLr31zS5_I-UeJWj4Olrufu9C7sr2-2DB4dDyKY4yf3g6Jr30JSLS3wfyMEWUbW1OVAzsB1wYhaWbUz0VWtGA
 ```
+
+
+

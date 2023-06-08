@@ -81,6 +81,7 @@ func Example_GenHighSCoze() {
    (ECDSA)"](https://www.rfc-editor.org/rfc/rfc6979)
  - [Signature Malleability on Wikipedia](https://en.wikipedia.org/wiki/Malleability_(cryptography))
 - [Non-modern Ed malleability demonstration](https://slowli.github.io/ed25519-quirks/malleability)
+- [Taming the many EdDSAs](https://csrc.nist.gov/csrc/media/Presentations/2023/crclub-2023-03-08/images-media/20230308-crypto-club-slides--taming-the-many-EdDSAs.pdf)
 
 
 

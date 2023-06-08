@@ -142,11 +142,11 @@ characters removed and use the base64url alphabet).
 ### Base 64 Canonical encoding (strict encoding) concerns
 Canonical (sometimes called "strict") base 64 encoding is required.  
 
-Why is canonical enocding important?  The b64ut strings `hOk` and `hOl` may
+Why is canonical encoding important?  The b64ut strings `hOk` and `hOl` may
 decode to the same byte string (Hex `84E9`), even though they are different
 UTF-8 values.  For the Hex value `84E9`, `hOk` is the strict encoding. 
 
-It order to prohibit malleability, it is required that Coze implementations
+In order to prohibit malleability, it is required that Coze implementations
 reject non-canonical encoding for Coze fields and use strict base64 values.  
 
 See the Github issue: https://github.com/Cyphrme/Coze/issues/18

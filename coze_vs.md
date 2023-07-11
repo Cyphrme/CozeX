@@ -247,33 +247,66 @@ for more notes on efficient encoding methods.
 
 
 # PASETO
+I'm not up-to-date with current PASETO (I dug originally into v1 but I
+understand that it has been deprecated), but it seems to look about the same.
+Coze has very different design ideals than PASETO.  PASETO is a whole other
+rabbit hole.  
+
+Overall, Coze is more generalized than PASETO.  PASETO was written as response
+to JWT while Coze is more like JOSE (minus the encryption).  
 
 
-I would say Coze is more generalized than PASETO.  I think PASETO was written more as response to JWT while Coze is more like JOSE (minus the encryption).  
+There are a lot of differences between the
+two.  Putting my salesman ballcap on:
 
-Coze 
+Coze
+
 - Is JSON.
-- Uses digests heavily in the design.  
-- Focuses on signing messages of any kind.  This includes session tokens.  
-- Permits several cipher suits ("algs") and hopes to expand with new industry standards.  (Currently ES244, ES256, ES384, ES512, Ed25519, Ed25519ph)
-- Defines a key format 
-- Signing, not encryption, is Coze's focus.  
+- Prohibits signature malleability.
+- Prohibits base 64 malleability.
+- Prohibits JSON duplicate fields which alleviates a category of security concern.
+- Does not suffer from re-encode ballooning.
+- Permits several cipher suits ("algs") and easily supports new standards.  (Currently ES244, ES256, ES384, ES512, Ed25519, Ed25519ph)
+- Easy to use online tools.  https://cyphr.me/coze
 
 
-PASETO's 
-- Is not JSON.
-- Does not use digests as references (For example, uses the public key directly.)
-- Focuses on security tokens.
-- Supports (two?) cipher suites (v3, v4)
-- Soatok pointed out, PASERK is an extension to PASETO that provides key-wrapping and serialization.
-- Supports encryption.
+PASETO
+
+- PASETO is not JSON.
+- PASETO does not prohibit signature malleability (See [V3 Sign section](https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version3.md#sign))
+  - [Great presentation that touches on signature malleability](https://csrc.nist.gov/csrc/media/Presentations/2023/crclub-2023-03-08/images-media/20230308-crypto-club-slides--taming-the-many-EdDSAs.pdf)
+- PASETO does not prohibit base 64 malleability.  (See [Base64 Malleability in Practice](https://dl.acm.org/doi/10.1145/3488932.3527284))
+- PASETO does not prohibit duplicate JSON fields which is a security concern (See [An Exploration of JSON Interoperability Vulnerabilities](https://bishopfox.com/blog/json-interoperability-vulnerabilities) and control-f "duplicate")
+- PASETO re-encode balloons which significantly increases the size of messages. 
+  - PASERK keys are design while targeting PASETO footers, yet since keys identifiers are encoded in base64, and the footer re-encodes any given value, (as the spec says:  `base64(f)`), these identifiers suffer from re-encode ballooning.
+  - This also applies to payloads themselves.  Since the signing step of PASETO is not JSON aware as it only encodes a given arbitrary message, any base64 encoded value in the message is re-encoded into base64. If PASETO was JSON, this re-encoding ballooning problem would not be an issue.  
+- PASETO supports only two cipher suites (which are used by v3 (ES384), and v4 (Ed25519))
+- PASETO has no online tools.  
 
 
-Both Coze and PASETO use b64ut for encoding binary values. 
+I'd love to see an online tool signing tool for PASETO, but none appear to exist (2023/07/11).  It would make playing around with it much easier.  Googling "online paseto tool" returns no results.  
 
-I'm not up-to-date with current PASETO (I dug originally into v1 but I understand that it has been deprecated), but it seems to look about the same.  
+
+Also note:
+-PASETO's signing step is not JSON aware.  (Consequently, this leads to re-encode ballooning and the duplicate JSON field issue).  
+- Coze does not define encryption methods as Coze's focus is signing, not encryption (this may change in the future).  PASETO has two modes, signing (called "public") and encryption (called "local").
+- PASETO payloads are JSON, and the resulting token is base64.  Any base64 encoded values in the JSON payload is re-encoded for the resulting token which results in re-encoding ballooning.
+- PASERK is an extension to PASETO that provides key-wrapping and serialization, but importantly serving as a standardized means for identifying which key was used to sign messages.  
+   - We see no reason for PASERK to have a `sid` and `pid`, let alone additionally `lid` and `kid`, All four of these fields are replaced by the Coze `tmb`.  
+- PASERK has four key identifier fields: `sid` `pid`; `lid` and `kid`.  All four of these fields are replaced in Coze by just `tmb`.  
+
+Coze Uses digests heavily in the design. PASETO uses digests less and doesn't have a defined equivalent to `cad` and `czd`.
+- PASETO doesn't always use digests as references and may use the public key directly as a reference.  
+- Coze focuses on signing JSON for any application.  This includes session tokens.  PASETO focuses on security tokens.  
+
+
+Both Coze and PASETO use base 64 for encoding binary values, but Coze uses a more strictly defined b64ut.
+
 
 
 See 
 - https://github.com/paseto-standard/paseto-spec
 - https://github.com/paseto-standard/paserk
+- https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version2.md
+- https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version3.md#sign
+- https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version4.md

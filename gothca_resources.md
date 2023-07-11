@@ -6,3 +6,9 @@ https://github.com/MystenLabs/ed25519-unsafe-libs/
 [Crypto Gotchas!](https://gotchas.salusa.dev)
 
 [Digital Signatures Do Not Guarantee Exclusive Ownership](https://www.bolet.org/~pornin/2005-acns-pornin+stern.pdf)
+
+
+
+## Cure rigidity
+https://safecurves.cr.yp.to/rigid.html
+(Be aware, the NIST p curves are not rigid)

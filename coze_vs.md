@@ -284,7 +284,31 @@ PASETO
 - PASETO has no online tools.  
 
 
-I'd love to see an online tool signing tool for PASETO, but none appear to exist (2023/07/11).  It would make playing around with it much easier.  Googling "online paseto tool" returns no results.  
+I'd love to see an online signing tool for PASETO, but none appear to exist (2023/07/11).  It would make playing around with it much easier.  Googling "online paseto tool" returns no results.
+
+Philosophically, both Coze and PASETO saw insufficiencies with JWT and JOSE or
+had different design goals with available specification.  Each took much
+different approaches in solving those issues.  
+
+PASETO saw the problems with JWT and sought to define a minimal and rigid spec.
+Its philosophy is along the lines of "I just need to do this one thing and I
+don't care about other features"  Consequently, any changes or differing
+features result in new specification needing to be written, for example a new
+algorithm would require a new "v5" spec to be written.  Or those features are
+simply left undefined by PASETO and is left to applications to define.  I think
+PASERK is a good example why PASETO isn't enough and is probably undersized, and
+PASETO should have broadened its considerations.  (Note that "v1"/"v2" are
+deprecated)
+
+Coze saw the problems with JOSE and sought to rigidly/strictly define semantics
+(base 64 encoding, signature malleability, defined references) but permits a
+general design that was easily extendable and anticipates future progress.
+Coze's philosophy is more "We want to do many things, so the spec must carefully
+define a few generic components that can be used for many different purposes".  
+
+
+
+
 
 
 Also note:

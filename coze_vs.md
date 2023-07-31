@@ -93,6 +93,7 @@ and we're glad it exists.
   headers less meaningful. 
 - Any string that re-encodes b64ut grows in size. normal JOSE objects, both the
   compact (like JWT) and JSON forms grow in size.
+- Every JWT library I've seen ignores JOSE/JWE and implements as minimal of JWS as they can.  (In other words, not a complete JWT implementation)
 
 
 JOSE:
@@ -105,8 +106,162 @@ tcGxlLmNvbS9pc19yb290Ijp0cnVlfQ",
 "signatures":[{"protected":"eyJhbGciOiJSUzI1NiJ9", sign over:
 UTF8(eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ)
 ```
- 
-## Coze Vs JOSE
+
+Great question!  I'm the co-author.  I'll put on my salesman ballcap:
+
+
+
+
+[← Back to Blog Home](/md/p0MEG9noH2YLgjIGgd2ch_1kWa-5Vb0v64EdtIWw_eQ) ![Coze
+vs.
+JOSE](https://cyphr.me/api/v1/b/file/cXVpMioLYtEfhsHxLcfN4aCmfIn8XLz6KBxOXi-8r-E)
+
+# Coze Vs. JOSE
+
+We get asked a lot, how does [Coze](https://github.com/Cyphrme/Coze) compare to
+[JOSE](https://datatracker.ietf.org/doc/html/rfc7515)?  
+
+![Coze is a cryptographic JSON messaging
+specification](https://cyphr.me/api/v1/b/file/PYWFU4P7Is_ccWCZYMVOyPmqGx_cXh7nBfhBP2ShbFw)
+
+Coze is a cryptographic JSON messaging specification.  It is open source (BSD 3)
+and has a [reference implementation is written in
+Go](https://github.com/Cyphrme/Coze) along with [a Javascript
+implementation](https://github.com/Cyphrme/CozeJS) a [CLI
+library](https://github.com/Cyphrme/CozeCLI), and an awesome [online
+tool](https://cyphr.me/coze).
+
+
+##### Coze is simple
+![Coze is
+simple](https://cyphr.me/api/v1/b/file/SDidVm2TpKJ--6--glRM361ehiloB9hy5mELO70YFLo)
+
+### How Coze Started
+When we first started, we knew we needed a dependable cryptographic framework
+for Cyphr.me which as it is deeply dependent on cryptography. We needed a
+standardized way to reference messages, replay attack prevention, signature
+malleability prevention, and other critical features we expected from a
+cryptographic framework.
+
+We surveyed existing tools and among those was JOSE. At first glance JOSE looked
+promising, but as we dug into it we quickly realized it was not suitable for our
+needs.  Implementing JOSE, or even just JWT, would have been hard and didn't
+have the features we anticipated. If we employed JOSE, it would have been for a
+specification that we were not happy with and needed additional restrictions on
+to meet our needs.  
+
+So we journeyed out on our own, and started work on what we first called the
+"radical cyphr", name such because it was a "radical" departure from existing
+tools.  We knew that "radical cyphr" was a terrible name, and Jared joked that
+we should just name it "Cyphr JOSE", or "CO-SEE" for short.  Eureka, Coze! We
+looked up the meaning, "a friendly talk; a chat" and it was perfect for a
+messaging standard.
+
+We first worked privately on the specification, and then publicly released Coze
+on Jun 8, 2021, which is 30 years and one day after the initial release of PGP
+1.0 as a nod to [cypherpunk Phil
+Zimmermann](https://www.netguru.com/blog/the-crypto-wars.-meet-philip-zimmermann-the-next-hidden-hero).  
+
+![Example
+Coze](https://cyphr.me/api/v1/b/file/AL0OfgodqHg6ZDiV-cQRwRceIbNq5ARlu5G9RtaqbNw)
+
+Coze, compared to JOSE, made design changes that focus on a simplified
+specification that's easy for application deployment.  We'll focus on larger
+concerns while omitting the smaller technical differences.  Sometimes people are
+unaware of JOSE and know of the more specific JWT, but the following applies to
+"Coze Vs. JWT" as well.  
+
+The both Coze and JOSE share:
+
+- Both permit several cipher suits ("algs") and easily supports new standards.
+  (ES244, ES256, ES384, ES512, Ed25519, Ed25519ph)
+- Both use at least some JSON in their construction.  
+- Coze and JOSE (the later RFC 7638) both define programmatic references for
+  keys.  Keys are probably where Coze and JOSE are the most similar.  
+
+## Coze
+
+- Is JSON.
+- Coze messages are smaller than JWT's. 
+- The Coze specification is much smaller than JOSE or JWT.  
+- Prohibits signature malleability.
+- Prohibits base 64 malleability.
+- Prohibits JSON duplicate fields which alleviates a category of security
+  concern.
+- Coze provides built-in replay protection using `czd`.
+- Does not suffer from re-encode ballooning.
+- Has a feature complete online tool. 
+- Provides a reference implementation.
+- Defines general purpose canonicalization.
+
+
+##### Cozies are smaller than JWT's
+![Cozies are
+smaller.](https://cyphr.me/api/v1/b/file/pxf8yOsYU8pvY9a8TkM4GugqVFaEVCfwWyZtCjsIQng)
+
+
+## JOSE 
+(Including JWS, JWK, JWE,  and JWT) 
+
+- JWT is not JSON.
+  - JWS is JSON, but it's not idiomatic JSON.  For example, it base64 encodes
+    JSON into JSON for headers.
+- JWT is downstream of other JOSE specs, JWS, JWE, JWK.  For a complete JWT
+  implementation, it needs to be implemented in view of JWS, JWE, and JWK which
+  are all complex.  We're not aware of any JWT library that does this, all JWT
+  libraries we're aware of are partial implementations.  
+- JOSE/JWT does not prohibit signature malleability.
+  - [Great presentation that touches on signature
+    malleability](https://csrc.nist.gov/csrc/media/Presentations/2023/crclub-2023-03-08/images-media/20230308-crypto-club-slides--taming-the-many-EdDSAs.pdf)
+- JOSE/JWT does not prohibit base 64 malleability.  (See [Base64 Malleability in
+  Practice](https://dl.acm.org/doi/10.1145/3488932.3527284))
+- JOSE/JWT does not prohibit duplicate JSON fields which is a security concern
+  (See [An Exploration of JSON Interoperability
+  Vulnerabilities](https://bishopfox.com/blog/json-interoperability-vulnerabilities)
+  and control-f "duplicate")
+- JOSE/JWT re-encode balloons which significantly increases the size of
+  messages.
+- JOSE has no built in replay protection.  JOSE places the burden of defining
+  unique message identifiers onto applications.  This also means various systems
+  are not out-of-the-box compatible.  See
+  [rfc7515-10.10](https://www.rfc-editor.org/rfc/rfc7515#section-10.10 )
+- [The functionality of JOSE online tools is
+  limited](https://docs.google.com/presentation/d/1bVojfkDs7K9hRwjr8zMW-AoHv5yAZjKL9Z3Bicz5Too/edit#slide=id.g12a4b67f0a0_0_43)
+- JOSE and JWT has no reference implementation.  
+- JOSE does not define general purpose canonicalization.  
+
+
+##### Cozies are human readable.  JWT's are not. 
+![Cozies are human
+readable](https://cyphr.me/api/v1/b/file/Rt5Blv7JhcaFef86Y0JOVVQeVyZX1WC8sJUfwrH8Ros)
+
+
+Overall, we're very please with Coze, and use it heavily throughout Cyphr.me. We
+hope the open source community finds it useful, or in the very least as an
+example pushing progress forward.  Coze glady accepts contributors on the
+existing [Go](https://github.com/Cyphrme/Coze) or
+[Javascript](https://github.com/Cyphrme/CozeJS) implementation.  The Coze
+project would also be thrilled to have implementation in other languages, such
+as Python, Rust, and PHP.  
+
+We're planning future posts comparing to Coze other specifications (ssh, SSHSIG,
+signify, pgp, PEM, the rest of JOSE (JWK, JWS) PASETO, PASERK, Bitcoin,
+Ethereum), but until then see the
+[coze_vs.md](https://github.com/Cyphrme/CozeX/blob/master/coze_vs.md) document.  
+
+We hope you enjoy Coze!
+
+[← Back to Blog Home](/md/p0MEG9noH2YLgjIGgd2ch_1kWa-5Vb0v64EdtIWw_eQ)
+
+
+
+
+
+
+
+
+
+
 ### Key Differentiators from JOSE to Coze.
 - Canonicalization is used in JOSE, but it's only applied narrowly to
   thumbprints.  JWS and JWTs can be out of order and not canonicalized.  
@@ -334,3 +489,15 @@ See
 - https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version2.md
 - https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version3.md#sign
 - https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version4.md
+
+
+
+
+
+
+# SQRL
+https://www.grc.com/sqrl/sqrl.htm
+
+SQRL (Secure Quick Reliable Login) is an authentication library targeting user
+login.  Coze is a cryptographic JSON messaging specification that authentication
+can be built on top of (See Cyphrpass).  

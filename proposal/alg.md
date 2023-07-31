@@ -1,5 +1,38 @@
-# Future Alg Considerations for Coze
+# Future Signing Alg Considerations for Coze
 
+
+# Adding an Algorithm To Coze Requirements
+- The algorithm must be widely adopted to be included in Coze.  
+  - Less adopted, less mature may be included in CozeX.  
+- The Go standard library should implement the algorithm primitive.
+- Signing algorithms must define a partner hashing algorithm.
+- Define values for "meta" variables.  For example:
+    Name: ES256
+    Genus: ECDSA
+    Family: EC
+    Use: sig
+    Hash: SHA-256
+    HashSize: 32
+    HashSizeB64: 43
+    XSize: 64
+    XSize64: 86
+    DSize: 32
+    DSize64: 43
+    Curve: P-256
+    SigSize: 64
+    SigSize64: 86
+
+- Coze prohibits signature malleability.
+  - A signature must only have a single valid form.  All other forms must be
+    invalid.  See "low-S" documentation.  
+- x must be derivable from d.  
+  - Consider using a seed as `d` if this is not possible out-of-the-box.  
+	- Look at Ed25519 `sss` vs seed as an example where this is addressed.  
+- Primitive Testing suit.
+- Adding the algorithm to Coze's existing tests where appropriate.  
+
+Also ideal:
+- Define a deterministic key generation method from a seed.
 
 ## Potential Future Support:
  - RSA

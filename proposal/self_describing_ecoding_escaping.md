@@ -1,4 +1,4 @@
-# Self-describing encoding
+# Self-describing text encoding
 In the future, it would be nice to support other encoding and/or support
 self-describing.
 

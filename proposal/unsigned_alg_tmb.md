@@ -56,11 +56,37 @@ appears related to the separate issue of kleptography, not necessarily a
 man-in-the-middle modification of `alg`'s value. (See gotcha_resources.md)
 
 JOSE appears to agree with our sentiment, [RFC
-7515-6](https://datatracker.ietf.org/doc/html/rfc7515), although they are always
-signing/integrity protecting `alg`:
+7515-6](https://datatracker.ietf.org/doc/html/rfc7515), although they appear to
+always signing/integrity protecting `alg`:
 
 >These Header Parameters MUST be integrity protected if the information that
 they convey is to be utilized in a trust decision; however, if the only
 information used in the trust decision is a key, these parameters need not be
 integrity protected, since changing them in a way that causes a different key to
 be used will cause the validation to fail.
+
+
+
+
+
+
+# Readme:
+
+Include the following FAW:
+
+#### Why is `alg`, `tmb` included in `pay`?
+The presence of `alg` and `tmb` in `pay` facilitates easier unmarshalling.
+However, since all Coze fields are optional, systems may choose to omit `alg`
+and `tmb` from `pay`. Idiomatically, if `pay` omits `alg` and/or `tmb`, `coze`
+should include those fields to ensure interoperability. For example:
+
+```json
+{
+  "pay": {
+    "msg": "Coze Rocks"
+  },
+  "alg": "ES256",
+  "tmb": "cLj8vsYtMBwYkzoFVZHBZo6SNL8wSdCIjCKAwXNuhOk",
+  "sig": "hsOY7LiyLX8ZqtGHqYuIwckz3WDEiy5BBPxibvR928QOiRKIzSsC0m8CW3A-OQI24_wqxbpyjvIEy2SHvdOwkA"
+}
+```

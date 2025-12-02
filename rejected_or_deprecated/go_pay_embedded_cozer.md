@@ -1,4 +1,5 @@
-# ⚠️ Decided against this design pattern in favor of embedding structs into Pay. ⚠️
+# ❌ Rejected
+⚠️ Decided against this design pattern in favor of embedding structs into Pay.
 
 
 Problems with this design:

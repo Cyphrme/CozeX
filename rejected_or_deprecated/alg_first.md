@@ -1,4 +1,5 @@
-# ⚠️ This document is deprecated ⚠️
+# ❌ Rejected
+⚠️ This document is deprecated 
 Changes made to Canon/Normal make the following irrelevant  Canon no longer has
 to be in Unicode order. 
 

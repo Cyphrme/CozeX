@@ -1,3 +1,17 @@
+
+# ❌ Rejected
+Rationale: 
+ - More bloat, 
+  - `dig` in favor of `msgd`
+ - if `msgd` was ever needed, we'd favor a three letter label, `mdg`.  
+ - `czd` should be used over `sigd`
+ - Leave `mdg` and `sigd` up to applications, doesn't need to be in Coze spec.
+ - Should be considered in wider discussion: https://github.com/Cyphrme/CozeX/issues/2
+
+
+
+## Original proposal:
+-------------------------------
 Adding three more fields to Coze:
 
 

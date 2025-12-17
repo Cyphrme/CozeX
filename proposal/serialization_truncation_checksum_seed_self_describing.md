@@ -1,3 +1,6 @@
+# Dumping ground for serialization, truncation, checksums, seeds and self-describing designs
+Since they are all related, any discussion needs to consider these other use cases.
+
 # Coze's `x` is derived from `d` assumption
 Coze assumes that `x` is derived from `d`.  In all Coze supported signing
 algorithms (ES224, ES256, ES384, ES512, Ed25519, Ed25519ph) x is directly
@@ -36,6 +39,14 @@ d.
 
 
 # Proposal: Checksums and Truncatable Thumbprints
+
+CRITICAL POINT: **There must be preexisting trust somewhere in the stack.** For
+Coze's integrity checking to be useful, key trust must be preestablished or the
+transport must be secure. Otherwise, an attacker can just change `cad`, `sig` or
+other parts of `pay`.  Designers need to keep this fact at the front of mind
+while thinking about this issue; checksums are only secure with this trust
+assumption.
+
 
 Before considering checksums, consider using `sig` as an integrity check via
 cryptographic verification.  This precludes most utility of secondary checksums.  

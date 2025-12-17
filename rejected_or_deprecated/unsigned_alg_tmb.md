@@ -1,3 +1,48 @@
+## ❌ Rejected
+Reconsider unsigned Alg and Tmb
+(✅  But provide guidance on the risks involved)
+https://github.com/Cyphrme/CozeX/blob/master/proposal/unsigned_alg_tmb.md
+
+## Rationale for Rejection: 
+As all Coz fields are already optional, there's nothing stopping an
+application from already doing this, although it is considered against best
+practices and can result in security concerns. Coz specifying unsigned is too
+much bloat, although we can provide warnings and general guidance.
+
+## Background
+Coz's payloads are already integrity protected. The concern is about an
+attacker modifying `alg`, resulting in an algorithm downgrade.  There may be
+unknown attacks where an attacker desires to change `tmb` to an attacker
+controlled key.
+
+Now, there _is_ some silliness in this circumstance I've heard in other projects
+where integrity protection is treated like magic.  If a Coze is transported
+outside of a secure transport, the integrity check itself can be forged. Trust
+to a specific key must be established first.  Signed/unsigned doesn't change
+this.
+
+This also doesn't stop an attacker from using signing with another key or a
+weaker key, again why key trust must be pre-established.
+
+This also add to Coz's logical checking.  "Does it exist here, or here?" Then it
+needs a new datastructure for unsigned vs signed.  That's too much complication.
+
+Coze should provide guidance and warnings if developers decide to do something
+like this.  This can be a foot gun.
+
+## Problems with unsigned:
+1. Algorithm confusion
+2. Algorithm downgrade
+ -  "alg:none" - (Coze doesn't do this already.)
+5. Key confusion.
+4. Injection
+   - Arbitrary file (reading files that should be accessible (local files)), database injection.
+   - Yes, this isn't directly a Coz issue, but it is something Coz should still think about.
+5. Additional, potentially confusing logic bloating Coze.
+
+
+
+
 # Unsigned `alg`, `iat`, `tmb`, and `typ`
 Ideally, Coze should be capable of including all standard fields not just in
 `pay` (e.g. `coze.pay.tmb`), but also unsigned in `coze` (e.g. `coze.tmb`).  The

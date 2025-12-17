@@ -3,8 +3,15 @@
 
 Booze is the binary equivalent to Coze.  Booze is designed to work with Coze.  
 
+We're not too serious about doing this, but this thought experiment is great for
+informing future designs and gives a baseline of what an efficient binary form
+would be. 
 
-## Why?
+Our thesis with Coze has been from the beginning that a well constructed, human
+readable form will be close to the efficiency of a binary form.
+
+
+## Why?  What's good about a binary form?
 - Base64 values are 33% larger than the binary form.  
 - JSON does not have a binary type.  
     - Binary values, encoded as b64ut, are typed as string in JSON.

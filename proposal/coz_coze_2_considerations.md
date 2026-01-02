@@ -1,6 +1,7 @@
+https://github.com/Cyphrme/CozeX/issues/2
 
-
-https://github.com/Cyphrme/CozeX/issues/2 
+Coze Proposals can be found at CozeX:
+https://github.com/Cyphrme/CozeX
 
 Work in progress. This is a dumping ground for design changes that would require
 a major version increment.  The following will be somewhat difficult to
@@ -21,6 +22,9 @@ msg   -> standard field
 dig   -> standard field
 Default update `now` in `pay` on sign
 `now` 2^53 – 1 error on exception
+ES256:cLj8vsYtMBwYkzoFVZHBZo6SNL8wSdCIjCKAwXNuhOk // Self-describing, non-JSON serialized digests, especially `tmb`s
+Revoke must interpret size set at max 2048 bytes
+Explicitly add: Coz assumes `pub` can be deterministically derived from `prv` for all supported algorithms.
 ```
 
 
@@ -33,8 +37,7 @@ Default update `now` in `pay` on sign
 
 
 
-## ✅ Cleanup before Coz
-
+## ✅ Cleanup Items
  - Add ES256K (secp256k1) Support to Coze
    https://github.com/Cyphrme/CozeX/issues/6
  - Update `now` as default behavior on sign.
@@ -53,14 +56,13 @@ cryptographic format.
 currently the only four letter label. 
 
 There is the question of pronunciation.  "Co-z" ("cozy"), two syllables, is
-still a great and memorable pronunciation.I'd advocate to "co-z" over the
+still a great and memorable pronunciation.  I'd advocate to "co-z" over the
 pronunciation to "cause", with a short "o" like "hot", not "cuz" like cousin or
 the English word "coze". 
 
 Alternative three letter names considered:
 - `cyf`  (short for Cyphr/Cypher/Cipher)  There doesn't appear to be any Unix
   naming conflict.  It isn't memorable.
-
 
 
 
@@ -182,6 +184,45 @@ to:
 ```
 
 
+## ✅ Revoke Max Size
+
+Add this to the spec:
+## Revoke
+A Coz key may be revoked by signing a coze containing the field `rvk` with an
+integer value greater than `0`. The integer value `1` is suitable to denote
+revocation and the current Unix timestamp is the suggested value. 
+
+`rvk` and `iat` must be a positive integer less than 2^53 – 1
+(9,007,199,254,740,991), which is the integer precision limit specified by
+IEEE754 minus one. Revoke checks must error if `rvk` is not an integer or larger
+than 2^53 - 1.
+
+Coz explicitly defines a self-revoke method so that third parties may revoke
+leaked keys. Systems storing Coz keys must accept valid revoke cozies where pay
+is under 2048 bytes and must immediately mark the associated key as revoked,
+even if a future revocation time is specified.
+
+
+Add to FAQ:
+#### Why does Coz have a revoke size limit? 
+Revoke coz messages, simply "revokes" or "revoke cozies", are limited to
+protect services from DoS/DDoS attacks using excessively large payloads.
+Services may safely ignore any revoke where pay exceeds 2048 bytes (2 KiB).  The
+revoke example in the README is only 172 bytes, leaving ample room for metadata.
+Since revokes reference keys via `tmb`, not `pub`, this is suitable for even
+post-quantum.  We also assume that future hash sizes used by Coz for addressing
+will not be much larger than 512 bits. The Go Coz library enforces this limit
+by default, with a configurable global variable available for custom needs
+(though increasing it is discouraged). Services may set stricter limits but must
+still handle valid revokes up to 2048 bytes. Services are not required to store
+the revoke message itself and are only required to mark the referenced key as
+revoked.  The requirement applies only to keys the service already hosts, not
+unknown keys.
+
+
+
+
+
 
 
 ## ✅ Formalize default behavior of updating `now` on sign of `pay`
@@ -237,6 +278,7 @@ Considerations
 - pky/sky - "sky" may be confusing. Also confusable with "primary key".
 
 
+
 ## 🤔 Seed only keys
 "Seed only keys" are entropic strings that are used by other algorithms to
 deterministically construct keys. The value for `prv` is the the source entropy.
@@ -283,6 +325,11 @@ for other algorithms, the "seed" value may differ from the value of `prv` which 
 }
 ```
 
+Cyphr.me has created a novel datastructure, the Digest Tree (DT), a reverse
+Merkle tree, that's useful for seeds. https://github.com/Cyphrme/Tree (TODO
+publish paper on the datastructure)  Coze could suggest this datastructure as
+the default derivation method.
+
 
 
 Considerations:
@@ -300,6 +347,7 @@ Considerations:
 Conclusion:
 - There's no real need for this now.
 - There's no reason to include this in core and not in X.
+- Can add this after 1.0
 
 
 
@@ -332,6 +380,81 @@ project, but other similar projects.
   have a hard limit. Perhaps `alg` parameters need to be reframed as "max size". 
 
 
+
+## ✅ Serialization, Truncation, Checksums, Seeds, and Self-describing
+Add to spec:
+
+
+## External Digest Serialization
+
+When Coz digest values (such as `tmb`, `dig`, `cad`, or `czd`) are stored
+outside of a coz and `alg` is not otherwise available, implementations should
+use the following self-describing, non-JSON format in order to preserve the
+cryptographic binding: the name of the algorithm, followed by the delimiter `:`,
+followed by the b64ut value.
+
+Examples:
+
+```text
+ES256:cLj8vsYtMBwYkzoFVZHBZo6SNL8wSdCIjCKAwXNuhOk
+SHA-256:zxcLp3BEYYoAZxM9QlV7lS4o3Jn1T0dz9L0pWPZJnIs
+```
+
+Optionally, for additional disambiguation, the prefix `coz:` may be prepended to the serialized form:
+
+```text
+coz:ES256:cLj8vsYtMBwYkzoFVZHBZo6SNL8wSdCIjCKAwXNuhOk
+```
+
+Also add to Alg section:
+Since the delimiter `:` is used for serialization, future Coz `alg` labels must
+never use the character `:`.
+
+
+
+## ✅ Coze's `pub` is derived from `prv` assumption
+Coze assumes that `pub` is derived from `prv`.  In all Coze supported signing
+algorithms (ES224, ES256, ES384, ES512, Ed25519, Ed25519ph) `pub` is directly
+related to `prv` and so assumption is valid.  We plan on keeping this assumption
+in place when supporting future algorithms.  A consequence of this assumption is
+that `prv` is equivalent to a fully validated seed and `pub` may be
+deterministically generated.  (The seed is "fully validated" meaning it might
+not be just a purely entropic string and has already been validated as being
+correct as input for deterministic generation of both `prv` and `pub`.  A purely
+random value, of sufficient entropy, may need a deterministic process defined to
+first generate a useful value.)
+
+Under some hypothetical signing schemes, what an algorithm calls the public
+key,`pub`, may not be derivable from what the algorithm names the private key,
+`prv`.  **This has been true of Ed25519 in the past**, although the latest
+implementations no longer follow this practice, generally for the same reasons
+why Coz is using the "seed" from Ed25519 and not the "secrete scalar s". See
+notes about naming on the Cyphr.me Ed25519 online tool
+(https://github.com/Cyphrme/Ed25519Tool)  The early written specification
+suggested using "secrete scalar s" (sss) as the private key, and x wasn't
+derivable from sss.  Implementations found using "seed" as the private key was
+more ideal.  When using seed for the value of "the private key", x is derivable.
+SSS may be cached, and seed is stored as the "private key".In that case `prv`
+and `pub` are generated at the same time from a single seed, but later the
+relationship between the two isn't knowable without both fields or a signature.
+In Coze, "d" is the RFC's seed and sss is recomputed when needed.
+
+We would argue that if there is such a case in the future, instead of using
+algorithm recommended values for "the private key", Coze can define a "fully
+validated seed as d" so the assumption `x` is related to `d` can remain in
+place.  Non-seed private components can be serialized to the end of `d`. 
+
+Breaking the `x` is derivable from `d` assumption would require a change to Go
+Coze functions `calcX` and `Correct()` and would likely require concatenation of
+private components into `d`.  Adding new key fields for private components is
+not desireable and makes the logic handling private component more difficult. If
+caching of private components is needed, those components should be appended to
+`d` and an concatenation method defined by Coze.  
+
+
+Coz assumes `pub` can be deterministically derived from `prv` for all supported
+algorithms. Private keys are treated as canonical seeds or normalized inputs
+that enable this derivation.
 
 
 

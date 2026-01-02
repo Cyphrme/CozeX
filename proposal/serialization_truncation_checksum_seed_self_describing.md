@@ -1,41 +1,6 @@
 # Dumping ground for serialization, truncation, checksums, seeds and self-describing designs
 Since they are all related, any discussion needs to consider these other use cases.
 
-# Coze's `x` is derived from `d` assumption
-Coze assumes that `x` is derived from `d`.  In all Coze supported signing
-algorithms (ES224, ES256, ES384, ES512, Ed25519, Ed25519ph) x is directly
-related to d and so assumption is valid.  We plan on keeping this assumption in
-place when supporting future algorithms.  A consequence of this assumption is
-that d is equivalent to a seed.  
-
-Under some hypothetical signing schemes, what an algorithm calls the public
-key,`x`, may not be derivable from what the algorithm names the private key,
-`d`. The algorithm would argue that `d` and `x` may be generated at the same
-time and the relationship isn't knowable without both fields.  Even under that
-circumstance, there must be a common source that `x` and `d` were derived from.
-Instead of using algorithm recommended values for "the private key", Coze can
-define a "seed as d" so the assumption `x` is related to `d` can remain in
-place.  Non-seed private components can be appended to the end of `d`. 
-
-Breaking the `x` is derivable from `d` assumption would require a change to Go
-Coze functions `calcX` and `Correct()` and would likely require concatenation of
-private components into `d`.  Adding new key fields for private components is
-not desireable and makes the logic handling private component more difficult. If
-caching of private components is needed, those components should be appended to
-`d` and an concatenation method defined by Coze.  
-
-This situation was encountered with Ed25519.  The early written specification
-suggested using "secrete scalar s" (sss) as the private key, and x wasn't
-derivable from sss.  Implementations found using "seed" as the private key was
-more ideal.  When using seed for the value of "the private key", x is derivable.
-SSS may be cached, and seed is stored as the "private key".   See also,
-Ed25519's naming differences in implementations, (see
-https://github.com/Cyphrme/ed25519_applet#naming-differences-in-implementations).
-In Coze, "d" is the RFC's seed and sss is recomputed when needed.
-
-How does this assumption affect checksums? If x was not derivable from d, tmb
-cannot serve as the checksum for d.  Otherwise, x may be used as a checksum for
-d.  
 
 
 # Proposal: Checksums and Truncatable Thumbprints
@@ -47,7 +12,6 @@ other parts of `pay`.  Designers need to keep this fact at the front of mind
 while thinking about this issue; checksums are only secure with this trust
 assumption.
 
-
 Before considering checksums, consider using `sig` as an integrity check via
 cryptographic verification.  This precludes most utility of secondary checksums.  
 
@@ -58,7 +22,7 @@ on. Checksum's hashing algorithm must align with `alg`.  Checksums may be
 truncated to any size.   
 
 Checksums begin after the character tilde, `~`.  Checksums must not begin
-strings.  
+strings.
 
 Example:
 ```JSON

@@ -24,7 +24,7 @@ Default update `now` in `pay` on sign
 `now` 2^53 – 1 error on exception
 ES256:cLj8vsYtMBwYkzoFVZHBZo6SNL8wSdCIjCKAwXNuhOk // Self-describing, non-JSON serialized digests, especially `tmb`s
 Revoke must interpret size set at max 2048 bytes
-Explicitly add: Coz assumes `pub` can be deterministically derived from `prv` for all supported algorithms.
+Explicitly add in Spec Alg section: Coz assumes `pub` can be deterministically derived from `prv` for all supported algorithms.
 ```
 
 

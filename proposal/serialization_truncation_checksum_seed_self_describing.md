@@ -1,9 +1,21 @@
-# Dumping ground for serialization, truncation, checksums, seeds and self-describing designs
-Since they are all related, any discussion needs to consider these other use cases.
+# Dumping ground for serialization, truncation, checksums/integrity, seeds and self-describing designs
+Since they are all related, any discussion needs to consider these other use
+cases.
+
+## `pub` is derived from `prv` assumption and it's relation to checksums/integrity
+This may be obvious, but wanted to make sure this was known for the context of
+this document:
+
+The assumption that `pub` is derivable
+from `prv` is now formally in the 1.0 spec. If `pub` was not derivable from `prv`, but instead shared a common seed from a
+third value, `tmb` cannot serve as an extended checksum for `prv` when `pub` is
+known.   See notes on Coz 1.0.  
+
+However, even if that were the case, `pub` may still be used as a "checksum",
+through signing and verification, for `prv`.
 
 
-
-# Proposal: Checksums and Truncatable Thumbprints
+## Proposal: Checksums and Truncatable Thumbprints
 
 CRITICAL POINT: **There must be preexisting trust somewhere in the stack.** For
 Coze's integrity checking to be useful, key trust must be preestablished or the

@@ -235,7 +235,7 @@ modification.
 
 ## ✅ Require `now` 2^53 – 1; error on exception, just like `rvk`
 Rationale: Since timestamps are already being used for mission critical tasks,
-Coz needs to ensure system compatibility amoung implementations. 
+Coz needs to ensure system compatibility among implementations. 
 
 	- Make sure this is enforced in implementations: `now` and `rvk` must be a
 	positive integer less than 2^53 – 1 (9,007,199,254,740,991).  Error on
@@ -447,7 +447,7 @@ place.  Non-seed private components can be serialized to the end of `d`.
 Breaking the `x` is derivable from `d` assumption would require a change to Go
 Coze functions `calcX` and `Correct()` and would likely require concatenation of
 private components into `d`.  Adding new key fields for private components is
-not desireable and makes the logic handling private component more difficult. If
+not desirable and makes the logic handling private component more difficult. If
 caching of private components is needed, those components should be appended to
 `d` and an concatenation method defined by Coze.  
 
@@ -516,7 +516,7 @@ keys/sigs are large, there's little Coz can do about it. For:
 For example, Ed25519 can have a seed or a private key.  There's reasons to store
 values when recomputation is expressive or impossible. 
 
-Right now Coze has just worked out, but there's no such guaruntee into the
+Right now Coze has just worked out, but there's no such guarantee into the
 future. 
 
 
